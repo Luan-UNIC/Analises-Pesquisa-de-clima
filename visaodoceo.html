@@ -2,7 +2,7 @@
 <!-- Application Structure Plan: A arquitetura foi redefinida para uma SPA multi-view controlada por abas. O objetivo é permitir ao CEO escolher seu nível de profundidade. View 1 (Dashboard Executivo): O sumário visual (o "O Quê"). View 2 (Análise Profunda): O "dossiê" analítico (o "Por Quê"), que integra a análise de causa-raiz (o "180 QI") diretamente ao lado dos gráficos. View 3 (Plano de Ação): A solução tática (o "E Agora?"). Esta estrutura espelha uma ferramenta de Business Intelligence, separando a visualização, da análise e da ação, mas mantendo-os conectados. -->
 <!-- Visualization & Content Choices: 
 - View 1 (Dashboard): Reutiliza os gráficos do infográfico anterior (Donut, Bares Horizontais, Cards) para uma visão rápida.
-- View 2 (Análise): O "coração". É uma página de "scrolly-telling" que usa Cards (HTML/Tailwind) para apresentar o S-N-Q e a Metodologia. Em seguida, usa um layout de grade (grid-cols-1 lg:grid-cols-2) para colocar os gráficos de Causa-Raiz (Chart.js) *diretamente* ao lado dos blocos de texto da análise "180 QI" (ex: "Paradoxo do Orgulho", "Falha Ativa de Gestão"). Isso prova a análise.
+- View 2 (Análise): O "coração". É uma página de "scrolly-telling" que usa Cards (HTML/Tailwind) para apresentar o S-N-Q e a Metodologia. Em seguida, usa um layout de grade (grid-cols-1 lg:grid-cols-2) para colocar os gráficos de Causa-Raiz (Chart.js)  diretamente  ao lado dos blocos de texto da análise "180 QI" (ex: "Paradoxo do Orgulho", "Falha Ativa de Gestão"). Isso prova a análise.
 - View 3 (Plano de Ação): Reutiliza a interface de abas (HTML/Tailwind + JS) para as 5 Frentes do plano, de forma dedicada.
 -->
 <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
@@ -181,7 +181,7 @@
         
         <nav class="sticky top-0 z-50 bg-[#ececec] border-b-2 border-gray-300 flex justify-center mb-6">
             <button data-nav-link="dashboard" class="active">Dashboard Executivo</button>
-            <button data-nav-link="analise">Análise Profunda (180 QI)</button>
+            <button data-nav-link="analise">Análise Aprofundada </button>
             <button data-nav-link="plano">Plano de Ação Tático</button>
         </nav>
 
@@ -287,7 +287,7 @@
                         </div>
                         <div class="callout-card">
                             <h4>2. Metodologia de Análise (Bottom-Up)</h4>
-                            <p>Invertemos a análise. Não olhamos para as médias das dimensões primeiro. Começamos pelas **perguntas específicas** com as piores notas em cada departamento e subimos ("drill-up") para a **dimensão primária** que elas impactam, revelando a verdadeira causa-raiz.</p>
+                            <p>Invertemos a análise. Não olhamos para as médias das dimensões primeiro. Começamos pelas   perguntas específicas   com as piores notas em cada departamento e subimos ("drill-up") para a   dimensão primária   que elas impactam, revelando a verdadeira causa-raiz.</p>
                         </div>
                     </div>
                 </section>
@@ -297,7 +297,7 @@
 
                     <div class="callout-card critical mb-6">
                         <h4>Divisão A: Controladoria e Operações (Líder Único)</h4>
-                        <p><b>Diagnóstico Combinado:</b> A análise das duas áreas revela um problema unificado e singular: uma **crise de Feedback e Reconhecimento**. O líder desta divisão enfrenta um desafio claro de prática de gestão e rituais de liderança. A manifestação e a gravidade são diferentes em cada equipe.</p>
+                        <p><b>Diagnóstico Combinado:</b> A análise das duas áreas revela um problema unificado e singular: uma   crise de Feedback e Reconhecimento  . O líder desta divisão enfrenta um desafio claro de prática de gestão e rituais de liderança. A manifestação e a gravidade são diferentes em cada equipe.</p>
                     </div>
                     
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
@@ -309,7 +309,7 @@
                         </div>
                         <div class="callout-card critical">
                             <h4>Análise (180 QI) - Controladoria</h4>
-                            <p>Uma nota **1.75** em "reconhecimento regular" não é uma "oportunidade"; é uma **falha ativa de gestão**. A equipe não está apenas "querendo mais feedback"; ela está sinalizando que **não recebe absolutamente nenhum reconhecimento**.</p>
+                            <p>Uma nota   1.75   em "reconhecimento regular" não é uma "oportunidade"; é uma   falha ativa de gestão  . A equipe não está apenas "querendo mais feedback"; ela está sinalizando que   não recebe absolutamente nenhum reconhecimento  .</p>
                             <p>A nota 2.25 em "frequência" confirma isso.</p>
                             <p><b>Impacto de Negócio:</b> Risco altíssimo de turnover, desengajamento e "demissão silenciosa". A equipe se gosta (`Conexão com Colegas` é 4.56), mas não se sente vista pela liderança.</p>
                         </div>
@@ -324,8 +324,8 @@
                         </div>
                         <div class="callout-card critical">
                             <h4>Análise (180 QI) - Operações</h4>
-                            <p>Operações vive um paradoxo perigoso. O problema de reconhecimento (2.88) é grave. No entanto, a **melhor dimensão** da área é `Embaixador` (Orgulho), com **4.93**.</p>
-                            <p><b>Diagnóstico:</b> Temos uma equipe que **ama a empresa, mas odeia como é gerenciada**. Eles têm orgulho do que fazem, mas se sentem invisíveis.</p>
+                            <p>Operações vive um paradoxo perigoso. O problema de reconhecimento (2.88) é grave. No entanto, a   melhor dimensão   da área é `Embaixador` (Orgulho), com   4.93  .</p>
+                            <p><b>Diagnóstico:</b> Temos uma equipe que   ama a empresa, mas odeia como é gerenciada  . Eles têm orgulho do que fazem, mas se sentem invisíveis.</p>
                             <p><b>Impacto de Negócio:</b> Este é um barril de pólvora. O orgulho está "segurando" o engajamento, mas a falta de reconhecimento (3.38) o corrói diariamente. É uma questão de tempo até o orgulho virar cinismo.</p>
                         </div>
                     </div>
@@ -339,8 +339,8 @@
                         </div>
                         <div class="callout-card critical">
                             <h4>Análise (180 QI) - Crédito e Cadastro</h4>
-                            <p>Este é o epicentro da **"Cultura de Evitação"**. O pilar forte da área é `Conexão com Líder` (4.50). A equipe confia no líder.</p>
-                            <p>O problema é **horizontal**. A nota 3.13 em "comunicação honesta" prova que os colegas não se sentem seguros para discordar ou apontar erros — uma falha grave de **segurança psicológica**.</p>
+                            <p>Este é o epicentro da   "Cultura de Evitação"  . O pilar forte da área é `Conexão com Líder` (4.50). A equipe confia no líder.</p>
+                            <p>O problema é   horizontal  . A nota 3.13 em "comunicação honesta" prova que os colegas não se sentem seguros para discordar ou apontar erros — uma falha grave de   segurança psicológica  .</p>
                             <p><b>Impacto de Negócio:</b> A "harmonia superficial" é inimiga da performance. Ela mascara erros, gera retrabalho e sufoca a inovação.</p>
                         </div>
                     </div>
@@ -354,9 +354,9 @@
                         </div>
                         <div class="callout-card" style="border-left-color: #80ba5c; background-color: #f7fbf5;">
                             <h4 style="color: #5d8a3c;">Análise (180 QI) - T.I</h4>
-                            <p>T.I. sofre do mesmo paradoxo de Operações. A melhor dimensão é `Embaixador` (**5.00**). São os maiores fãs da empresa.</p>
+                            <p>T.I. sofre do mesmo paradoxo de Operações. A melhor dimensão é `Embaixador` (  5.00  ). São os maiores fãs da empresa.</p>
                             <p>Contudo, a pior dimensão é `Empoderamento` (3.86), causada pela nota 3.25 em "processos interdepartamentais".</p>
-                            <p><b>Diagnóstico:</b> A equipe de T.I. está engajada, mas **frustrada e de mãos atadas** pela burocracia e caos processual *entre* as áreas.</p>
+                            <p><b>Diagnóstico:</b> A equipe de T.I. está engajada, mas   frustrada e de mãos atadas   pela burocracia e caos processual  entre  as áreas.</p>
                             <p><b>Impacto de Negócio:</b> T.I. é o sistema nervoso central. Se eles estão frustrados com processos, toda a empresa sofre com gargalos.</p>
                         </div>
                     </div>
@@ -370,7 +370,7 @@
                         </div>
                         <div class="callout-card">
                             <h4>Análise (180 QI) - Áreas de Excelência</h4>
-                            <p>Departamentos como `Marketing` (5.00), `Financeiro` (4.90) e `Gente e Cultura` (4.86) não são "sortudos"; eles são **benchmarks internos**.</p>
+                            <p>Departamentos como `Marketing` (5.00), `Financeiro` (4.90) e `Gente e Cultura` (4.86) não são "sortudos"; eles são   benchmarks internos  .</p>
                             <p>Seus líderes estão ativamente praticando os rituais de gestão que faltam em Controladoria e Operações.</p>
                             <p><b>Impacto de Negócio:</b> Essas áreas são a fonte da solução. Devemos usá-las como modelos e seus líderes como mentores para as áreas críticas.</p>
                         </div>
