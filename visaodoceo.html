@@ -1,9 +1,10 @@
 <!-- Chosen Palette: Paleta Unic (Azul: #005882, Verde: #80ba5c, Roxo: #77479f, Cinza: #ececec) -->
-<!-- Application Structure Plan: A arquitetura foi redefinida para uma SPA multi-view controlada por abas. O objetivo é permitir ao CEO escolher seu nível de profundidade. View 1 (Dashboard Executivo): O sumário visual (o "O Quê"). View 2 (Análise Profunda): O "dossiê" analítico (o "Por Quê"), que integra a análise de causa-raiz (o "180 QI") diretamente ao lado dos gráficos. View 3 (Plano de Ação): A solução tática (o "E Agora?"). Esta estrutura espelha uma ferramenta de Business Intelligence, separando a visualização, da análise e da ação, mas mantendo-os conectados. -->
+<!-- Application Structure Plan: A arquitetura é uma SPA de 3 visões (Dashboard, Análise Profunda, Plano de Ação), permitindo ao CEO navegar entre o "O Quê" (KPIs), o "Por Quê" (a análise de causa-raiz) e o "E Agora?" (a solução de 6 meses). A navegação por abas foi escolhida para condensar uma quantidade massiva de informações (diagnóstico + dossiê + plano) em uma única ferramenta interativa, sem sobrecarregar o usuário. O fluxo guia o usuário do sintoma à solução. -->
 <!-- Visualization & Content Choices: 
-- View 1 (Dashboard): Reutiliza os gráficos do infográfico anterior (Donut, Bares Horizontais, Cards) para uma visão rápida.
-- View 2 (Análise): O "coração". É uma página de "scrolly-telling" que usa Cards (HTML/Tailwind) para apresentar o S-N-Q e a Metodologia. Em seguida, usa um layout de grade (grid-cols-1 lg:grid-cols-2) para colocar os gráficos de Causa-Raiz (Chart.js) *diretamente* ao lado dos blocos de texto da análise "180 QI" (ex: "Paradoxo do Orgulho", "Falha Ativa de Gestão"). Isso prova a análise.
-- View 3 (Plano de Ação): Reutiliza a interface de abas (HTML/Tailwind + JS) para as 5 Frentes do plano, de forma dedicada.
+- Navegação Principal: (Goal: Organize) -> Abas (HTML/Tailwind + JS) para trocar as 3 visões principais.
+- (Aba Dashboard): KPIs (Big Numbers), Distribuição (Donut), Rankings (Bares) - Conforme o infográfico anterior. Foco no "O Quê".
+- (Aba Análise Profunda): (Goal: Inform/Analyze) -> Texto longo formatado (HTML/Tailwind) misturado com 5 Gráficos de Causa-Raiz (Chart.js/Canvas). Esta aba *é* o "dossiê" (relatorio_ceo_analise_profunda.md) formatado, ligando a análise qualitativa (texto) à prova quantitativa (gráfico). Foco no "Por Quê".
+- (Aba Plano de Ação): (Goal: Organize/Inform) -> Abas secundárias (HTML/Tailwind + JS) para as 5 Frentes. Tabelas (HTML) usadas para detalhar as ações. Foco no "E Agora?".
 -->
 <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
 <!DOCTYPE html>
@@ -11,7 +12,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Estratégico - Pesquisa de Clima Unic</title>
+    <title>Dashboard Estratégico (CEO) - Pesquisa de Clima Unic</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
@@ -76,64 +77,74 @@
             color: #005882;
             margin-bottom: 1rem;
         }
-        h4 {
-            font-size: 1.15rem;
-            font-weight: 700;
-            color: #034d6f;
-            margin-top: 1.5rem;
-            margin-bottom: 0.75rem;
-        }
-        h5 {
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: #005882;
-            margin-bottom: 0.5rem;
-        }
-
         p {
             font-size: 0.95rem;
             line-height: 1.6;
             margin-bottom: 1rem;
         }
-        ul {
-            list-style-type: disc;
-            list-style-position: inside;
-            padding-left: 0.5rem;
-            margin-bottom: 1rem;
-        }
-        li {
-            font-size: 0.95rem;
-            line-height: 1.6;
-            margin-bottom: 0.5rem;
-        }
         
-        [data-tab-button] {
-            padding: 0.75rem 1rem;
+        .text-bold-highlight {
+            font-weight: 700;
+            color: #034d6f;
+        }
+        .text-critical-highlight {
+            font-weight: 700;
+            color: #77479f;
+        }
+
+        /* Navegação Principal */
+        [data-main-tab-button] {
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
             font-weight: 600;
             color: #333;
             background-color: #d6d6d6;
-            border-top-left-radius: 0.375rem;
-            border-top-right-radius: 0.375rem;
+            border-radius: 0.375rem 0.375rem 0 0;
             cursor: pointer;
             transition: all 0.2s ease-in-out;
             border-bottom: 4px solid transparent;
             margin-right: 0.25rem;
         }
-        [data-tab-button].active {
+        [data-main-tab-button].active {
             color: #FFFFFF;
             background-color: #005882;
             border-bottom: 4px solid #77479f;
         }
-        [data-tab-content] {
+        [data-main-tab-content] {
             display: none;
-            padding: 1.5rem;
-            border: 1px solid #d6d6d6;
-            border-top: none;
-            border-radius: 0 0 0.5rem 0.5rem;
         }
-        [data-tab-content].active {
+        [data-main-tab-content].active {
             display: block;
         }
+
+        /* Navegação Secundária (Plano de Ação) */
+        [data-tab] {
+            padding: 0.75rem 1rem;
+            font-weight: 600;
+            color: #005882; /* Texto Azul */
+            background-color: #FFFFFF; /* Fundo Branco */
+            border-top-left-radius: 0.375rem;
+            border-top-right-radius: 0.375rem;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            margin-right: 0.25rem;
+            border: 1px solid #d6d6d6;
+        }
+        [data-tab].active {
+            color: #FFFFFF; /* Texto Branco */
+            background-color: #005882; /* Fundo Azul */
+            font-weight: 700;
+            border: 1px solid #005882;
+        }
+        [data-tab-content] {
+            display: none;
+            background-color: #FFFFFF;
+            padding: 1.5rem;
+            border: 1px solid #d6d6d6;
+            border-top: none; /* Remove a borda superior para conectar */
+            border-radius: 0 0 0.5rem 0.5rem;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
@@ -152,72 +163,43 @@
         tbody tr:nth-child(odd) {
             background-color: #f9f9f9;
         }
-        
-        [data-nav-link] {
-            padding: 0.75rem 1.5rem;
-            font-size: 1rem;
-            font-weight: 600;
-            color: #034d6f;
-            cursor: pointer;
-            border-bottom: 4px solid transparent;
-            transition: all 0.2s ease-in-out;
-        }
-        [data-nav-link].active {
-            color: #005882;
-            border-bottom: 4px solid #005882;
-        }
-        
-        [data-view] {
-            display: none;
-        }
-        [data-view].active {
-            display: block;
-        }
-        
+
         .callout-card {
-            border-left: 5px solid #005882;
-            background-color: #f0f7fb;
+            background-color: #f9f9f9;
+            border-left: 5px solid #80ba5c;
             padding: 1rem 1.5rem;
-            border-radius: 0.375rem;
             margin-bottom: 1.5rem;
+            border-radius: 0 0.25rem 0.25rem 0;
         }
         .callout-card.critical {
             border-left-color: #77479f;
-            background-color: #f9f5fb;
         }
-        
-        .callout-card h5 {
-            color: #005882;
-        }
-        .callout-card.critical h5 {
-            color: #77479f;
-        }
-
-        .text-bold-highlight {
-            font-weight: 700;
-            color: #034d6f;
-        }
-
     </style>
 </head>
 <body class="antialiased">
 
     <div class="container mx-auto max-w-7xl p-4 md:p-8">
 
-        <h1>Dashboard Estratégico - Pesquisa de Clima Unic</h1>
-        
-        <nav class="sticky top-0 z-50 bg-[#ececec] border-b-2 border-gray-300 flex justify-center mb-6">
-            <button data-nav-link="dashboard" class="active">Dashboard Executivo</button>
-            <button data-nav-link="analise">Análise Profunda</button>
-            <button data-nav-link="plano">Plano de Ação Tático</button>
+        <h1>Dashboard Estratégico (CEO): Pesquisa de Clima Unic</h1>
+        <p class="text-center text-lg text-gray-600 mb-8">Ferramenta de inteligência estratégica: do "O Quê" (Dashboard) ao "Por Quê" (Análise) e "E Agora?" (Plano de Ação).</p>
+
+        <!-- NAVEGAÇÃO PRINCIPAL -->
+        <nav id="mainTabButtons" class="flex flex-wrap mb-4">
+            <button data-main-tab-button="dashboard" class="active">Dashboard Executivo</button>
+            <button data-main-tab-button="analise">Análise Profunda</button>
+            <button data-main-tab-button="plano">Plano de Ação Tático</button>
         </nav>
 
-        <main>
-        
-            <div data-view="dashboard" class="active">
+        <!-- CONTEÚDO DAS ABAS PRINCIPAIS -->
+        <div id="mainTabContents">
+
+            <!-- ======================= -->
+            <!-- ABA 1: DASHBOARD EXECUTIVO -->
+            <!-- ======================= -->
+            <div data-main-tab-content="dashboard" class="active">
                 <section class="card text-center">
                     <h2 class="text-center">1. Sumário Executivo (Visão Drill-Up)</h2>
-                    <p>O clima organizacional geral é excelente (4.52), com 71.8% de notas máximas. Esta média positiva oculta riscos estratégicos em áreas-chave (Controladoria, Crédito) e em temas centrais (Feedback, Compensação).</p>
+                    <p>O clima organizacional geral é excelente (<span class="text-bold-highlight">4.52</span>), com 71.8% de notas máximas. Esta média positiva oculta riscos estratégicos em áreas-chave (Controladoria, Crédito) e em temas centrais (Feedback, Compensação).</p>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
                         <div>
                             <h3 class="text-lg">Média Geral da Empresa</h3>
@@ -274,7 +256,7 @@
                         
                         <div class="border-l-4 border-[#77479f] bg-gray-50 p-6 rounded-r-lg">
                             <h3>A "Cultura de Evitação"</h3>
-                            <p>A conexão entre colegas (Dimensão 3.72) é um foco crítico. A equipe não se sente segura para "comunicação honesta" (Pergunta 3.13).</p>
+                            <p>A conexão entre colegas (Dimensão <span class="text-bold-highlight">3.72</span> em Crédito) é um foco crítico. A equipe não se sente segura para "comunicação honesta" (Pergunta <span class="text-bold-highlight">3.13</span>).</p>
                             <div class="grid grid-cols-2 gap-4 text-center">
                                 <div class="border-2 border-[#77479f] rounded-lg p-4">
                                     <h4 class="text-lg font-semibold">Conexão (Crédito)</h4>
@@ -293,187 +275,189 @@
 
                 <section class="card">
                     <h2>3. Análise Departamental (Onde estão os Riscos)</h2>
-                    <p>Os problemas não são homogêneos. O gráfico abaixo classifica os departamentos e expõe onde os riscos estão concentrados. As áreas críticas (`Controladoria`, `Crédito e Cadastro`) necessitam de ação imediata.</p>
+                    <p>Os problemas não são homogêneos. O gráfico abaixo classifica os departamentos e expõe onde os riscos estão concentrados. As áreas críticas (<span class="text-critical-highlight">Controladoria</span>, <span class="text-critical-highlight">Crédito e Cadastro</span>) necessitam de ação imediata.</p>
                     <div class="chart-container h-128">
                         <canvas id="departamentosChart"></canvas>
                     </div>
                 </section>
-            </div>
-            
-            <div data-view="analise">
+
                 <section class="card">
-                    <h2>Dossiê de Análise Profunda</h2>
-                    <p>Esta é a análise de causa-raiz "bottom-up" que fundamenta as decisões estratégicas. Começamos com a "cena do crime" (a pior pergunta) e subimos até o impacto no negócio (a dimensão).</p>
+                    <h2>4. Análise de Causa-Raiz (Por que o Risco Existe)</h2>
+                    <p>Mergulhamos nas piores perguntas das áreas de atenção, conforme a análise `bottom-up`. Esta é a causa-raiz que o plano de ação deve resolver.</p>
                     
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+                        
+                        <div class="border-4 border-[#77479f] rounded-lg p-6">
+                            <h3 class="text-[#77479f]">Foco 1: Controladoria (Média 3.88)</h3>
+                            <p><span class="text-bold-highlight">Diagnóstico:</span> Epicentro da "Crise de Rituais". A nota <span class="text-bold-highlight">1.75</span> é um estado de emergência e indica uma falha ativa na gestão de reconhecimento.</p>
+                            <div class="chart-container h-64">
+                                <canvas id="causaControladoriaChart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="border-4 border-[#77479f] rounded-lg p-6">
+                            <h3 class="text-[#77479f]">Foco 2: Operações (Média 4.40)</h3>
+                            <p><span class="text-bold-highlight">Diagnóstico:</span> O "Paradoxo do Orgulho". A equipe tem orgulho (4.93), mas não se sente reconhecida (<span class="text-bold-highlight">2.88</span>). Amam a empresa, mas não a gestão.</p>
+                            <div class="chart-container h-64">
+                                <canvas id="causaOperacoesChart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="border-4 border-[#77479f] rounded-lg p-6">
+                            <h3 class="text-[#77479f]">Foco 3: Crédito e Cadastro (Média 4.10)</h3>
+                            <p><span class="text-bold-highlight">Diagnóstico:</span> Epicentro da "Cultura de Evitação". A equipe confia no líder (4.50), mas não confia nos colegas para "comunicação honesta" (<span class="text-bold-highlight">3.13</span>).</p>
+                            <div class="chart-container h-64">
+                                <canvas id="causaCreditoChart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="border-4 border-[#80ba5c] rounded-lg p-6">
+                            <h3 class="text-[#80ba5c]">Foco 4: T.I (Média 4.37)</h3>
+                            <p><span class="text-bold-highlight">Diagnóstico:</span> A "Crise de Processos". A equipe tem orgulho (5.00), mas sente-se frustrada e "de mãos atadas" por falhas na comunicação entre áreas (<span class="text-bold-highlight">3.25</span>).</p>
+                            <div class="chart-container h-64">
+                                <canvas id="causaTiChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- ======================= -->
+            <!-- ABA 2: ANÁLISE PROFUNDA -->
+            <!-- ======================= -->
+            <div data-main-tab-content="analise">
+                <section class="card">
+                    <h2>Análise de Causa-Raiz (Bottom-Up)</h2>
+                    <p>Esta é a análise estratégica detalhada. Invertemos a lógica, começando pela "cena do crime" (a pior pergunta) e subindo para a dimensão primária, revelando o diagnóstico preciso.</p>
+                </section>
+
+                <section class="card">
                     <h3>1. Diagnóstico Estratégico (S-N-Q)</h3>
                     <div class="callout-card">
-                        <p><b>Situação:</b> O clima geral da Unic é excelente (**4.52**), com 71.8% de notas máximas. Nossos pilares são a `Conexão com Líder` (4.72) e o `Orgulho` (Embaixador - 4.64).</p>
-                        <p><b>Necessidade (O Problema Oculto):</b> Esta média positiva mascara três riscos de alta magnitude, concentrados em áreas específicas. Não temos um problema de *clima* generalizado; temos problemas *cirúrgicos* de *gestão* e *processos* que estão sendo contidos (por enquanto) pelo orgulho dos colaboradores.</p>
-                        <p><b>Questão (A Ação):</b> Como atuamos cirurgicamente nos focos de risco (Controladoria, Operações, Crédito) para prevenir uma erosão sistêmica do engajamento?</p>
-                    </div>
-
-                    <h3>2. Metodologia de Análise (Bottom-Up)</h3>
-                    <div class="callout-card">
-                        <p>Invertemos a análise. Não olhamos para as médias das dimensões primeiro. Começamos pela "cena do crime": as **perguntas específicas** com as piores notas em cada departamento. A partir delas, subimos ("drill-up") para a **dimensão primária** que elas impactam, revelando a verdadeira causa-raiz e seu impacto no negócio.</p>
+                        <p><span class="text-bold-highlight">Situação:</span> O clima geral da Unic é excelente (<span class="text-bold-highlight">4.52</span>), com 71.8% de notas máximas. Nossos pilares são a `Conexão com Líder` (4.72) e o `Orgulho` (Embaixador - 4.64).</p>
+                        <p><span class="text-bold-highlight">Necessidade (O Problema Oculto):</span> Esta média positiva mascara três riscos de alta magnitude, concentrados em áreas específicas. Não temos um problema de <span class="italic">clima</span> generalizado; temos problemas <span class="text-bold-highlight">cirúrgicos</span> de <span class="italic">gestão</span> e <span class="italic">processos</span> que estão sendo contidos (por enquanto) pelo orgulho dos colaboradores.</p>
+                        <p><span class="text-bold-highlight">Questão (A Ação):</span> Como atuamos cirurgicamente nos focos de risco (Controladoria, Operações, Crédito) para prevenir uma erosão sistêmica do engajamento?</p>
                     </div>
                 </section>
                 
                 <section class="card">
-                    <h2>3. Análise de Causa-Raiz por Divisão</h2>
+                    <h2>2. Análise de Causa-Raiz por Divisão</h2>
 
                     <div class="callout-card critical mb-6">
                         <h4>Divisão A: Controladoria e Operações (Líder Único)</h4>
-                        <p><b>Diagnóstico Combinado:</b> A análise das duas áreas revela um **problema unificado e singular: uma crise de Feedback e Reconhecimento**. O líder desta divisão enfrenta um desafio claro de *prática de gestão* e *rituais de liderança*. Embora o problema seja o mesmo, a manifestação e a gravidade são diferentes em cada equipe.</p>
+                        <p><span class="text-bold-highlight">Diagnóstico Combinado:</span> A análise das duas áreas revela um <span class="text-bold-highlight">problema unificado e singular: uma crise de Feedback e Reconhecimento</span>. O líder desta divisão enfrenta um desafio claro de <span class="italic">prática de gestão</span> e <span class="italic">rituais de liderança</span>. Embora o problema seja o mesmo, a manifestação e a gravidade são diferentes em cada equipe.</p>
                     </div>
                     
-                    <h4 class="text-xl font-bold text-[#77479f]">3A. Controladoria (O Epicentro)</h4>
+                    <h4 class="text-xl font-bold text-[#77479f] mb-4">3A. Controladoria (O Epicentro)</h4>
                     <p class="font-semibold">Ponto de Partida (A Pergunta Mais Profunda):</p>
-                    <ul>
-                        <li>`"Eu recebo reconhecimento regularmente (pelo menos uma vez por mês) quando faço um bom trabalho."` -> **Média da Área: 1.75** (A pior nota de toda a pesquisa).</li>
-                        <li>`"A frequência de feedback que recebo do meu líder é a ideal."` -> **Média da Área: 2.25**</li>
+                    <ul class="list-disc list-inside mb-4">
+                        <li>`"Eu recebo reconhecimento regularmente..."` -> <span class="text-bold-highlight">Média da Área: 1.75</span> (A pior nota de toda a pesquisa).</li>
+                        <li>`"A frequência de feedback que recebo... é a ideal."` -> <span class="text-bold-highlight">Média da Área: 2.25</span></li>
                     </ul>
 
                     <div class="border-4 border-[#77479f] rounded-lg p-6 my-4">
-                        <h5 class="text-center text-[#77479f]">Causa-Raiz: Controladoria</h5>
+                        <h3 class="text-[#77479f]">Causa-Raiz: Controladoria</h3>
                         <div class="chart-container h-64">
                             <canvas id="causaControladoriaChart_Analise"></canvas>
                         </div>
                     </div>
-
-                    <div class="callout-card critical">
-                        <h5>Análise - Controladoria</h5>
-                        <p>Uma nota <span class="text-bold-highlight">1.75</span> não é uma "oportunidade"; é uma <span class="text-bold-highlight">falha ativa de gestão</span>. A equipe não está apenas "querendo mais feedback"; ela está sinalizando que <span class="text-bold-highlight">não recebe absolutamente nenhum reconhecimento</span>.</p>
-                        <p><b>Causa-Raiz:</b> A dimensão `Reconhecimento & Feedback` é a pior da área (<span class="text-bold-highlight">2.88</span>).</p>
-                        <p><b>Impacto de Negócio:</b> Risco altíssimo de turnover de talentos, desengajamento, erros operacionais (afinal, ninguém é corrigido) e "demissão silenciosa". A equipe se gosta (`Conexão com Colegas` é 4.56), mas não se sente vista pela liderança.</p>
-                    </div>
+                    <p class="font-semibold mt-4">Análise:</p>
+                    <p>Uma nota <span class="text-bold-highlight">1.75</span> não é uma "oportunidade"; é uma <span class="text-bold-highlight">falha ativa de gestão</span>. A equipe não está apenas "querendo mais feedback"; ela está sinalizando que <span class="text-bold-highlight">não recebe absolutamente nenhum reconhecimento</span>. A nota 2.25 em "frequência" confirma isso. O impacto de negócio é um risco altíssimo de turnover, erros operacionais (afinal, ninguém é corrigido) e "demissão silenciosa". A equipe se gosta (`Conexão com Colegas` é 4.56), mas não se sente vista pela liderança.</p>
 
                     <hr class="my-8 border-gray-300">
 
-                    <h4 class="text-xl font-bold text-[#77479f]">3B. Operações (O Paradoxo do Orgulho)</h4>
+                    <h4 class="text-xl font-bold text-[#77479f] mb-4">3B. Operações (O Paradoxo do Orgulho)</h4>
                     <p class="font-semibold">Ponto de Partida (A Pergunta Mais Profunda):</p>
-                    <ul>
-                        <li>`"Eu recebo reconhecimento regularmente (pelo menos uma vez por mês) quando faço um bom trabalho."` -> **Média da Área: 2.88** (A mesma pergunta da Controladoria).</li>
+                    <ul class="list-disc list-inside mb-4">
+                        <li>`"Eu recebo reconhecimento regularmente..."` -> <span class="text-bold-highlight">Média da Área: 2.88</span> (A mesma pergunta da Controladoria).</li>
                     </ul>
 
                     <div class="border-4 border-[#77479f] rounded-lg p-6 my-4">
-                        <h5 class="text-center text-[#77479f]">Causa-Raiz: Operações</h5>
+                        <h3 class="text-[#77479f]">Causa-Raiz: Operações</h3>
                         <div class="chart-container h-64">
                             <canvas id="causaOperacoesChart_Analise"></canvas>
                         </div>
                     </div>
-                    
-                    <div class="callout-card critical">
-                        <h5>Análise - Operações</h5>
-                        <p>Operações vive um paradoxo perigoso. O problema de reconhecimento (2.88) é grave. No entanto, a <span class="text-bold-highlight">melhor dimensão</span> da área é `Embaixador` (Orgulho), com <span class="text-bold-highlight">4.93</span>.</p>
-                        <p><b>Diagnóstico:</b> Temos uma equipe que <span class="text-bold-highlight">ama a empresa, mas odeia como é gerenciada</span>. Eles têm orgulho do que fazem, mas se sentem invisíveis.</p>
-                        <p><b>Causa-Raiz:</b> A dimensão `Reconhecimento & Feedback` é a pior da área (<span class="text-bold-highlight">3.38</span>).</p>
-                        <p><b>Impacto de Negócio:</b> Este é um barril de pólvora. O orgulho está "segurando" o engajamento, mas a falta de reconhecimento o corrói diariamente. É uma questão de tempo até que o orgulho se transforme em cinismo ("Eu dou tudo por esta empresa e nem um 'obrigado' eu recebo?").</p>
-                    </div>
-                    
+                    <p class="font-semibold mt-4">Análise:</p>
+                    <p>Operações vive um paradoxo perigoso. O problema de reconhecimento (2.88) é grave. No entanto, a <span class="text-bold-highlight">melhor dimensão</span> da área é `Embaixador` (Orgulho), com <span class="text-bold-highlight">4.93</span>. O diagnóstico é claro: temos uma equipe que <span class="text-bold-highlight">ama a empresa, mas odeia como é gerenciada</span>. Eles têm orgulho do que fazem, mas se sentem invisíveis. Este é um barril de pólvora. O orgulho está "segurando" o engajamento, mas a falta de reconhecimento o corrói diariamente. É uma questão de tempo até que o orgulho se transforme em cinismo ("Eu dou tudo por esta empresa e nem um 'obrigado' eu receo?").</p>
+
                     <hr class="my-8 border-gray-300">
                     
-                    <h4 class="text-xl font-bold text-[#77479f]">Divisão B: Crédito e Cadastro</h4>
+                    <h4 class="text-xl font-bold text-[#77479f] mb-4">Divisão B: Crédito e Cadastro</h4>
                      <p class="font-semibold">Ponto de Partida (A Pergunta Mais Profunda):</p>
-                    <ul>
-                        <li>`"No trabalho, a comunicação é direta e honesta."` -> **Média da Área: 3.13**</li>
-                        <li>`"Confio em meus colegas."` -> **Média da Área: 3.50**</li>
+                    <ul class="list-disc list-inside mb-4">
+                        <li>`"No trabalho, a comunicação é direta e honesta."` -> <span class="text-bold-highlight">Média da Área: 3.13</span></li>
+                        <li>`"Confio em meus colegas."` -> <span class="text-bold-highlight">Média da Área: 3.50</span></li>
                     </ul>
 
                     <div class="border-4 border-[#77479f] rounded-lg p-6 my-4">
-                        <h5 class="text-center text-[#77479f]">Causa-Raiz: Crédito e Cadastro</h5>
+                         <h3 class="text-[#77479f]">Causa-Raiz: Crédito e Cadastro</h3>
                         <div class="chart-container h-64">
                             <canvas id="causaCreditoChart_Analise"></canvas>
                         </div>
                     </div>
+                    <p class="font-semibold mt-4">Análise:</p>
+                    <p>Este é o epicentro da <span class="text-bold-highlight">"Cultura de Evitação"</span>. O problema não é "falta de amizade"; o pilar forte da área é `Conexão com Líder` (4.50). A equipe confia no líder. O problema é <span class="text-bold-highlight">horizontal</span>. A nota 3.13 em "comunicação honesta" prova que os colegas não se sentem seguros para discordar, apontar erros ou debater ideias — uma falha grave de <span class="text-bold-highlight">segurança psicológica</span>. A "harmonia superficial" é inimiga da performance: mascara erros, gera retrabalho e sufoca a inovação.</p>
 
-                    <div class="callout-card critical">
-                        <h5>Análise - Crédito e Cadastro</h5>
-                        <p>Este é o epicentro da <span class="text-bold-highlight">"Cultura de Evitação"</span>. O problema não é "falta de amizade"; o pilar forte da área é `Conexão com Líder` (4.50). A equipe confia no líder.</p>
-                        <p>O problema é <span class="text-bold-highlight">horizontal</span>. A nota 3.13 em "comunicação honesta" prova que os colegas não se sentem seguros para discordar, apontar erros ou debater ideias — uma falha grave de <span class="text-bold-highlight">segurança psicológica</span>.</p>
-                        <p><b>Causa-Raiz:</b> A dimensão `Conexão com Colegas` é a pior da área (<span class="text-bold-highlight">3.72</span>).</p>
-                        <p><b>Impacto de Negócio:</b> A "harmonia superficial" é inimiga da performance. Ela mascara erros, gera retrabalho (pois ninguém aponta a falha no processo), sufoca a inovação e cria silos <span class="text-bold-highlight">dentro</span> da própria equipe.</p>
-                    </div>
-                    
                     <hr class="my-8 border-gray-300">
                     
-                    <h4 class="text-xl font-bold text-[#80ba5c]">Divisão C: T.I (O Risco Sistêmico)</h4>
+                    <h4 class="text-xl font-bold text-[#80ba5c] mb-4">Divisão C: T.I (O Risco Sistêmico)</h4>
                     <p class="font-semibold">Ponto de Partida (A Pergunta Mais Profunda):</p>
-                    <ul>
-                         <li>`"Os processos de comunicação e de tomada de decisão entre os departamentos funcionam perfeitamente."` -> **Média da Área: 3.25**</li>
+                    <ul class="list-disc list-inside mb-4">
+                         <li>`"Os processos de comunicação e de tomada de decisão entre os departamentos funcionam perfeitamente."` -> <span class="text-bold-highlight">Média da Área: 3.25</span></li>
                     </ul>
 
                      <div class="border-4 border-[#80ba5c] rounded-lg p-6 my-4">
-                        <h5 class="text-center text-[#80ba5c]">Causa-Raiz: T.I</h5>
-                         <div class="chart-container h-64">
+                        <h3 class="text-[#80ba5c]">Causa-Raiz: T.I</h3>
+                        <div class="chart-container h-64">
                             <canvas id="causaTiChart_Analise"></canvas>
                         </div>
                     </div>
-
-                    <div class="callout-card" style="border-left-color: #80ba5c; background-color: #f7fbf5;">
-                        <h5 style="color: #5d8a3c;">Análise - T.I</h5>
-                        <p>T.I. sofre do mesmo paradoxo de Operações. A melhor dimensão é `Embaixador` (<span class="text-bold-highlight">5.00</span>). São os maiores fãs da empresa.</p>
-                        <p>Contudo, a pior dimensão é `Empoderamento` (3.86), causada pela nota 3.25 em "processos interdepartamentais".</p>
-                        <p><b>Diagnóstico:</b> A equipe de T.I. está engajada, mas <span class="text-bold-highlight">frustrada e de mãos atadas</span>. Eles se sentem "desempoderados" não por seus líderes diretos, mas pela burocracia, falta de documentação e caos processual <span class="text-bold-highlight">entre</span> as áreas.</p>
-                        <p><b>Impacto de Negócio:</b> T.I. é o sistema nervoso central. Se eles estão frustrados com processos, toda a empresa sofre com gargalos. Eles não estão apenas reclamando; estão alertando sobre uma ineficiência sistêmica.</p>
-                    </div>
+                    <p class="font-semibold mt-4">Análise:</p>
+                    <p>T.I. sofre do mesmo paradoxo de Operações. A melhor dimensão é `Embaixador` (<span class="text-bold-highlight">5.00</span>). Eles são os maiores fãs da empresa. Contudo, a pior dimensão é `Empoderamento` (3.86), causada pela nota 3.25 em "processos interdepartamentais". A equipe de T.I. está engajada, mas <span class="text-bold-highlight">frustrada e de mãos atadas</span>. Eles se sentem "desempoderados" não por seus líderes diretos, mas pela burocracia e caos processual <span class="text-bold-highlight">entre</span> as áreas. Eles não estão apenas reclamando; estão alertando sobre uma ineficiência sistêmica.</p>
 
                     <hr class="my-8 border-gray-300">
                     
-                    <h4 class="text-xl font-bold text-[#005882]">Divisão D: Áreas de Excelência</h4>
-                    <p>Departamentos como `Marketing` (5.00), `Financeiro` (4.90) e `Gente e Cultura` (4.86) não são "sortudos"; eles são **benchmarks internos**. Seus líderes estão ativamente praticando os rituais de gestão que faltam em Controladoria e Operações.</p>
+                    <h4 class="text-xl font-bold text-[#005882] mb-4">Divisão D: Áreas de Excelência</h4>
+                    <p>Departamentos como `Marketing` (5.00), `Financeiro` (4.90) e `Gente e Cultura` (4.86) não são "sortudos"; eles são <span class="text-bold-highlight">benchmarks internos</span>. Seus líderes estão ativamente praticando os rituais de gestão que faltam em Controladoria e Operações. Devemos usá-los como modelos e seus líderes como mentores.</p>
                     
                     <div class="border-4 border-[#005882] rounded-lg p-6 my-4">
-                        <h5 class="text-center text-[#005882]">Benchmark: Desempenho de Todas as Áreas</h5>
-                         <div class="chart-container h-128">
-                            <canvas id="benchmarksChart_Analise"></canvas>
+                        <h3 class="text-[#005882]">Benchmark: Melhores Áreas</h3>
+                        <div class="chart-container h-64">
+                            <canvas id="causaBenchmarkChart_Analise"></canvas>
                         </div>
                     </div>
-                    
-                    <div class="callout-card">
-                        <h5>Análise - Áreas de Excelência</h5>
-                        <p><b>Impacto de Negócio:</b> Essas áreas são a fonte da solução. Devemos usá-las como modelos e seus líderes como mentores para as áreas críticas.</p>
-                    </div>
-
-                    <hr class="my-8 border-gray-300">
-                    
-                    <h3>4. Conclusão e Preparação para Ação</h3>
-                    <p>A análise bottom-up prova que os problemas da Unic não são culturais, mas <span class="text-bold-highlight">cirúrgicos e de gestão</span>:</p>
-                    <ul class="list-disc list-inside space-y-3 text-gray-700">
-                        <li>
-                            <strong class="text-[#77479f]">1. Crise de Rituais (Controladoria & Operações):</strong> O líder precisa de um plano de ação focado em implementar rituais básicos de gestão (1-on-1s, reconhecimento público/privado).
-                        </li>
-                        <li>
-                            <strong class="text-[#005882]">4. Risco Estratégico (Empresa):</strong> O `Paradoxo da Compensação` (Benefícios 4.81 vs. Salário 3.75) é o único risco <span class="text-bold-highlight">sistêmico</span> que afeta a todos e deve ser tratado no nível executivo (revisão de C&S).
-                        </li>
-                    </ul>
                 </section>
             </div>
-            
-            <div data-view="plano">
+
+            <!-- ======================= -->
+            <!-- ABA 3: PLANO DE AÇÃO -->
+            <!-- ======================= -->
+            <div data-main-tab-content="plano">
                 <section class="card">
-                    <h2>Plano de Ação Estratégico (Próximos 6 Meses)</h2>
+                    <h2>Plano de Ação Tático (Próximos 6 Meses)</h2>
                     
-                    <blockquote class="text-center font-semibold text-lg italic text-gray-700 bg-gray-100 p-4 rounded-lg border-l-4 border-[#005882] my-6">
-                        <span class="text-2xl font-bold text-[#005882]">🎯</span> <span class="text-xl">PRINCÍPIO-GUIA</span><br>
-                        “Não queremos mais harmonia superficial. Queremos colaboração real — feita de clareza, confiança e coragem para falar o que precisa ser dito.”
-                    </blockquote>
+                    <div class="callout-card mt-6">
+                        <p class="font-semibold text-lg italic text-gray-700">🎯 PRINCÍPIO-GUIA:</p>
+                        <p class="font-semibold text-lg italic text-gray-700">“Não queremos mais harmonia superficial. Queremos colaboração real — feita de clareza, confiança e coragem para falar o que precisa ser dito.”</p>
+                    </div>
+
+                    <p><b>Cenário:</b> Baixo pensamento conceitual + cultura de evitação de conflito + percepção distorcida sobre processos e ferramentas.</p>
                     
                     <nav id="tabButtons" class="flex flex-wrap mt-6">
                         <button data-tab="frente1" class="active">FRENTE 1: Diagnóstico</button>
                         <button data-tab="frente2">FRENTE 2: Consciência</button>
                         <button data-tab="frente3">FRENTE 3: Aprendizado Prático</button>
-                        <button data-tab="frente4">FRENTE 4: Segurança Psicológica</button>
+                        <button data-tab="frente4">FRENTE 4: Segurança</button>
                         <button data-tab="frente5">FRENTE 5: Processos</button>
                     </nav>
 
                     <div id="tabContents">
                         <div data-tab-content="frente1" class="active">
                             <h3 class="!text-lg !font-bold">FRENTE 1: Entendimento silencioso e diagnóstico sem exposição</h3>
-                            <div class="callout-card my-4">
-                                <h5 class="!text-base">Objetivo</h5>
-                                <p class="!mb-0">Aprofundar a leitura da cultura real sem forçar exposição emocional ou conversas diretas (que gerariam retraimento).</p>
-                            </div>
-                            <h4>🔹 Ações</h4>
+                            <p><b>Objetivo:</b> Aprofundar a leitura da cultura real sem forçar exposição emocional ou conversas diretas (que gerariam retraimento).</p>
+                            <p class="font-semibold mt-4">🧩 Racional:</p>
+                            <p>As pessoas não precisam se expor; elas apenas veem a tradução dos problemas de forma objetiva e despersonalizada. Assim, o debate se desloca de “quem errou” para “o que não está funcionando”.</p>
                             <table>
                                 <thead>
                                     <tr>
@@ -508,17 +492,13 @@
                                     </tr>
                                 </tbody>
                             </table>
-                            <h4 class="mt-6">🧩 Racional</h4>
-                            <p class="italic text-gray-700">As pessoas não precisam se expor; elas apenas veem a tradução dos problemas de forma objetiva e despersonalizada. Assim, o debate se desloca de “quem errou” para “o que não está funcionando”.</p>
                         </div>
 
                         <div data-tab-content="frente2">
                             <h3 class="!text-lg !font-bold">FRENTE 2: Construção de consciência coletiva por meio de exemplos e storytelling</h3>
-                            <div class="callout-card my-4">
-                                <h5 class="!text-base">Objetivo</h5>
-                                <p class="!mb-0">Elevar o nível conceitual da organização sem exigir abstração direta, usando histórias e casos práticos.</p>
-                            </div>
-                            <h4>🔹 Ações</h4>
+                            <p><b>Objetivo:</b> Elevar o nível conceitual da organização sem exigir abstração direta, usando histórias e casos práticos.</p>
+                            <p class="font-semibold mt-4">🧩 Racional:</p>
+                            <p>Ao invés de falar sobre “conceitos”, a empresa vê exemplos concretos e visuais, o que facilita a compreensão de quem pensa de forma analítica e prática.</p>
                             <table>
                                 <thead>
                                     <tr>
@@ -553,17 +533,13 @@
                                     </tr>
                                 </tbody>
                             </table>
-                            <h4 class="mt-6">🧩 Racional</h4>
-                            <p class="italic text-gray-700">Ao invés de falar sobre “conceitos”, a empresa vê exemplos concretos e visuais, o que facilita a compreensão de quem pensa de forma analítica e prática.</p>
                         </div>
 
                         <div data-tab-content="frente3">
                             <h3 class="!text-lg !font-bold">FRENTE 3: Aprendizado prático: transformar o conflito em método, não em conversa</h3>
-                            <div class="callout-card my-4">
-                                <h5 class="!text-base">Objetivo</h5>
-                                <p class="!mb-0">Introduzir o desconforto de forma controlada, usando ferramentas estruturadas para que o conflito seja percebido como parte do trabalho, não como um ataque pessoal.</p>
-                            </div>
-                            <h4>🔹 Ações</h4>
+                            <p><b>Objetivo:</b> Introduzir o desconforto de forma controlada, usando ferramentas estruturadas para que o conflito seja percebido como parte do trabalho, não como um ataque pessoal.</p>
+                            <p class="font-semibold mt-4">🧩 Racional:</p>
+                            <p>O conflito é “transferido” do campo emocional para o campo técnico, permitindo que as pessoas pratiquem discordância sem risco social.</p>
                             <table>
                                 <thead>
                                     <tr>
@@ -598,17 +574,13 @@
                                     </tr>
                                 </tbody>
                             </table>
-                            <h4 class="mt-6">🧩 Racional</h4>
-                            <p class="italic text-gray-700">O conflito é “transferido” do campo emocional para o campo técnico, permitindo que as pessoas pratiquem discordância sem risco social.</p>
                         </div>
                         
                         <div data-tab-content="frente4">
                             <h3 class="!text-lg !font-bold">FRENTE 4: Segurança Psicológica e Comunicação Institucional</h3>
-                            <div class="callout-card my-4">
-                                <h5 class="!text-base">Objetivo</h5>
-                                <p class="!mb-0">Criar um ambiente em que as pessoas entendam que falar com sinceridade é uma forma de colaboração e não de confronto.</p>
-                            </div>
-                             <h4>🔹 Ações</h4>
+                            <p><b>Objetivo:</b> Criar um ambiente em que as pessoas entendam que falar com sinceridade é uma forma de colaboração e não de confronto.</p>
+                            <p class="font-semibold mt-4">🧩 Racional:</p>
+                            <p>Honestidade e coragem passam a ser valores institucionalizados e valorizados, não apenas esperados.</p>
                              <table>
                                 <thead>
                                     <tr>
@@ -650,17 +622,11 @@
                                     </tr>
                                 </tbody>
                             </table>
-                            <h4 class="mt-6">🧩 Racional</h4>
-                            <p class="italic text-gray-700">Honestidade e coragem passam a ser valores institucionalizados e valorizados, não apenas esperados.</p>
                         </div>
 
                         <div data-tab-content="frente5">
                             <h3 class="!text-lg !font-bold">FRENTE 5: Integração e Processos (fase de maturidade)</h3>
-                            <div class="callout-card my-4">
-                                <h5 class="!text-base">Objetivo</h5>
-                                <p class="!mb-0">Transformar o aprendizado cultural em estrutura operacional estável.</p>
-                            </div>
-                            <h4>🔹 Ações</h4>
+                            <p><b>Objetivo:</b> Transformar o aprendizado cultural em estrutura operacional estável.</p>
                             <table>
                                 <thead>
                                     <tr>
@@ -693,11 +659,10 @@
                             </table>
                         </div>
                     </div>
-                </section>
 
-                <section class="card">
-                    <h2>📊 Indicadores de Sucesso (Próximos 6 Meses)</h2>
-                    <p>O sucesso deste plano será medido por mudanças tangíveis na percepção e comportamento, não apenas pela conclusão das tarefas.</p>
+                    <hr class="my-8 border-gray-300">
+
+                    <h3 class="!text-lg !font-bold">📊 INDICADORES DE SUCESSO (Metas de 6 meses)</h3>
                     <table>
                         <thead>
                             <tr>
@@ -710,39 +675,35 @@
                             <tr>
                                 <td>Honestidade e transparência</td>
                                 <td>Crescimento de 20% nas menções positivas sobre “liberdade para opinar” na pesquisa pulse</td>
-                                <td class="font-semibold text-center">+20%</td>
+                                <td class="text-bold-highlight">+20%</td>
                             </tr>
                             <tr>
                                 <td>Comunicação interdepartamental</td>
                                 <td>Aumento de 15% na nota de “Comunicação entre áreas”</td>
-                                <td class="font-semibold text-center">+15%</td>
+                                <td class="text-bold-highlight">+15%</td>
                             </tr>
                             <tr>
                                 <td>Engajamento organizacional</td>
                                 <td>Aumento de 10% no índice geral de engajamento</td>
-                                <td class="font-semibold text-center">+10%</td>
+                                <td class="text-bold-highlight">+10%</td>
                             </tr>
                             <tr>
                                 <td>Conflitos construtivos</td>
                                 <td>Pelo menos 50% dos líderes reportam ter enfrentado e resolvido um conflito técnico de forma colaborativa</td>
-                                <td class="font-semibold text-center">≥50%</td>
+                                <td class="text-bold-highlight">≥50%</td>
                             </tr>
                         </tbody>
                     </table>
-                </section>
-                
-                <section class="card">
-                    <h2>💬 Mensagem de Cultura</h2>
-                    <blockquote class="text-center font-semibold text-lg italic text-gray-700 bg-gray-100 p-6 rounded-lg border-l-4 border-[#005882]">
-                        “Na Unic, acreditamos que o verdadeiro trabalho em equipe não é a ausência de conflito — é a capacidade de conversar com respeito e clareza sobre o que precisa melhorar.
-                        <br><br>
-                        A confiança nasce da transparência. E a colaboração nasce quando cada um tem coragem de dizer o que vê e o que precisa.”
-                    </blockquote>
+
+                    <div class="callout-card mt-8">
+                        <p class="font-semibold text-lg italic text-gray-700">💬 MENSAGEM DE CULTURA (para todos os colaboradores)</p>
+                        <p class="font-semibold text-lg italic text-gray-700">“Na Unic, acreditamos que o verdadeiro trabalho em equipe não é a ausência de conflito — é a capacidade de conversar com respeito e clareza sobre o que precisa melhorar. A confiança nasce da transparência. E a colaboração nasce quando cada um tem coragem de dizer o que vê e o que precisa.”</p>
+                    </div>
+
                 </section>
             </div>
-            
-        </main>
-        
+        </div>
+
     </div>
 
     <script>
@@ -810,171 +771,345 @@
                 }
             };
 
-            const deptData = [5.00, 4.90, 4.86, 4.81, 4.79, 4.40, 4.37, 4.10, 3.88];
-            const deptLabels = ['Marketing', 'Financeiro', 'Gente e Cultura', 'Facilities', 'Cobrança', 'Operações', 'T.I', 'Crédito e Cadastro', 'Controladoria'];
-            const deptColors = deptData.map(d => d >= 4.5 ? colorPositive : (d < 4.1 ? colorCritical : colorNeutral));
+            // Função para destruir gráfico existente
+            const destroyChart = (chart) => {
+                if (chart) {
+                    chart.destroy();
+                }
+            };
 
-            new Chart(document.getElementById('distribuicaoChart').getContext('2d'), {
-                type: 'doughnut',
-                data: {
-                    labels: ['Nota 5 (71.8%)', 'Nota 4 (14.3%)', 'Nota 3 (9.2%)', 'Notas 1-2 (4.6%)'],
-                    datasets: [{
-                        data: [71.8, 14.3, 9.2, 4.6],
-                        backgroundColor: [colorPositive, colorPositiveMedium, colorPositiveLight, colorCritical],
-                        borderColor: '#FFFFFF',
-                        borderWidth: 4
-                    }]
-                },
-                options: {
-                    ...commonTooltipOptions,
-                    plugins: {
-                        ...commonTooltipOptions.plugins,
-                        legend: {
-                            display: true,
-                            position: 'bottom'
+            // Armazenamento de instâncias de gráficos
+            let charts = {};
+
+            // Função para criar gráficos do Dashboard
+            const createDashboardCharts = () => {
+                destroyChart(charts.dist);
+                const ctxDist = document.getElementById('distribuicaoChart')?.getContext('2d');
+                if (ctxDist) {
+                    charts.dist = new Chart(ctxDist, {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['Nota 5 (71.8%)', 'Nota 4 (14.3%)', 'Nota 3 (9.2%)', 'Notas 1-2 (4.6%)'],
+                            datasets: [{
+                                data: [71.8, 14.3, 9.2, 4.6],
+                                backgroundColor: [colorPositive, colorPositiveMedium, colorPositiveLight, colorCritical],
+                                borderColor: '#FFFFFF',
+                                borderWidth: 4
+                            }]
+                        },
+                        options: {
+                            ...commonTooltipOptions,
+                            plugins: {
+                                ...commonTooltipOptions.plugins,
+                                legend: {
+                                    display: true,
+                                    position: 'bottom'
+                                }
+                            }
                         }
+                    });
+                }
+
+                destroyChart(charts.fortes);
+                const ctxFortes = document.getElementById('fortesChart')?.getContext('2d');
+                if(ctxFortes) {
+                    charts.fortes = new Chart(ctxFortes, {
+                        type: 'bar',
+                        data: {
+                            labels: ['Conexão com líder', 'Embaixador', 'Crescimento pessoal', 'Bem-estar'],
+                            datasets: [{
+                                label: 'Média',
+                                data: [4.72, 4.64, 4.56, 4.55],
+                                backgroundColor: colorPositive,
+                                borderRadius: 4
+                            }]
+                        },
+                        options: commonHorizontalOptions
+                    });
+                }
+
+                destroyChart(charts.fracos);
+                const ctxFracos = document.getElementById('fracosChart')?.getContext('2d');
+                if(ctxFracos) {
+                    charts.fracos = new Chart(ctxFracos, {
+                        type: 'bar',
+                        data: {
+                            labels: [
+                                'Compensação', 
+                                ['Frequência de', 'reconhecimento'], 
+                                ['Frequência de', 'Feedback'], 
+                                ['Rotina de', 'Processos']
+                            ],
+                            datasets: [{
+                                label: 'Média',
+                                data: [3.75, 3.94, 3.97, 4.06],
+                                backgroundColor: colorCritical,
+                                borderRadius: 4
+                            }]
+                        },
+                        options: commonHorizontalOptions
+                    });
+                }
+
+                destroyChart(charts.deptos);
+                const ctxDeptos = document.getElementById('departamentosChart')?.getContext('2d');
+                const deptData = [5.00, 4.90, 4.86, 4.81, 4.79, 4.40, 4.37, 4.10, 3.88];
+                const deptColors = deptData.map(d => d >= 4.5 ? colorPositive : (d < 4.1 ? colorCritical : colorNeutral));
+                if(ctxDeptos) {
+                    charts.deptos = new Chart(ctxDeptos, {
+                        type: 'bar',
+                        data: {
+                            labels: ['Marketing', 'Financeiro', 'Gente e Cultura', 'Facilities', 'Cobrança', 'Operações', 'T.I', 'Crédito e Cadastro', 'Controladoria'],
+                            datasets: [{
+                                label: 'Média Departamental',
+                                data: deptData,
+                                backgroundColor: deptColors,
+                                borderRadius: 4
+                            }]
+                        },
+                        options: commonHorizontalOptions
+                    });
+                }
+
+                destroyChart(charts.controladoria);
+                const ctxControladoria = document.getElementById('causaControladoriaChart')?.getContext('2d');
+                if(ctxControladoria) {
+                    charts.controladoria = new Chart(ctxControladoria, {
+                        type: 'bar',
+                        data: {
+                            labels: [
+                                ['Reconhecimento', 'regular (1.75)'], 
+                                ['Frequência ideal', 'de feedback (2.25)'], 
+                                ['Conexão com', 'líder (3.80)']
+                            ],
+                            datasets: [{
+                                label: 'Média da Pergunta',
+                                data: [1.75, 2.25, 3.80],
+                                backgroundColor: colorCritical,
+                                borderRadius: 4
+                            }]
+                        },
+                        options: commonHorizontalOptions
+                    });
+                }
+
+                destroyChart(charts.operacoes);
+                const ctxOperacoes = document.getElementById('causaOperacoesChart')?.getContext('2d');
+                if(ctxOperacoes) {
+                    charts.operacoes = new Chart(ctxOperacoes, {
+                        type: 'bar',
+                        data: {
+                            labels: [
+                                ['Reconhecimento', 'regular (2.88)'],
+                                ['Dimensão: Reconhec.', '& Feedback (3.38)']
+                            ],
+                            datasets: [{
+                                label: 'Média da Pergunta',
+                                data: [2.88, 3.38],
+                                backgroundColor: colorCritical,
+                                borderRadius: 4
+                            }]
+                        },
+                        options: commonHorizontalOptions
+                    });
+                }
+
+                destroyChart(charts.credito);
+                const ctxCredito = document.getElementById('causaCreditoChart')?.getContext('2d');
+                if(ctxCredito) {
+                    charts.credito = new Chart(ctxCredito, {
+                        type: 'bar',
+                        data: {
+                            labels: [
+                                ['Comunicação direta', 'e honesta (3.13)'],
+                                ['Confio em meus', 'colegas (3.50)'],
+                                ['Dimensão: Conexão', 'com colegas (3.72)']
+                            ],
+                            datasets: [{
+                                label: 'Média da Pergunta',
+                                data: [3.13, 3.50, 3.72],
+                                backgroundColor: colorCritical,
+                                borderRadius: 4
+                            }]
+                        },
+                        options: commonHorizontalOptions
+                    });
+                }
+
+                destroyChart(charts.ti);
+                const ctxTi = document.getElementById('causaTiChart')?.getContext('2d');
+                if(ctxTi) {
+                    charts.ti = new Chart(ctxTi, {
+                        type: 'bar',
+                        data: {
+                            labels: [
+                                ['Processos entre', 'departamentos (3.25)'],
+                                ['Dimensão:', 'Empoderamento (3.86)']
+                            ],
+                            datasets: [{
+                                label: 'Média da Pergunta',
+                                data: [3.25, 3.86],
+                                backgroundColor: colorNeutral, 
+                                borderRadius: 4
+                            }]
+                        },
+                        options: commonHorizontalOptions
+                    });
+                }
+            };
+            
+            // Função para criar gráficos da Aba Análise
+            const createAnaliseCharts = () => {
+                destroyChart(charts.controladoriaAnalise);
+                const ctxControladoriaAnalise = document.getElementById('causaControladoriaChart_Analise')?.getContext('2d');
+                if(ctxControladoriaAnalise) {
+                    charts.controladoriaAnalise = new Chart(ctxControladoriaAnalise, {
+                        type: 'bar',
+                        data: {
+                            labels: [
+                                ['Reconhecimento', 'regular (1.75)'], 
+                                ['Frequência ideal', 'de feedback (2.25)'], 
+                                ['Dimensão: Reconhec.', '& Feedback (2.88)']
+                            ],
+                            datasets: [{
+                                label: 'Média da Pergunta',
+                                data: [1.75, 2.25, 2.88],
+                                backgroundColor: colorCritical,
+                                borderRadius: 4
+                            }]
+                        },
+                        options: commonHorizontalOptions
+                    });
+                }
+
+                destroyChart(charts.operacoesAnalise);
+                const ctxOperacoesAnalise = document.getElementById('causaOperacoesChart_Analise')?.getContext('2d');
+                if(ctxOperacoesAnalise) {
+                    charts.operacoesAnalise = new Chart(ctxOperacoesAnalise, {
+                        type: 'bar',
+                        data: {
+                            labels: [
+                                ['Reconhecimento', 'regular (2.88)'],
+                                ['Dimensão: Reconhec.', '& Feedback (3.38)'],
+                                ['Dimensão: Embaixador', '(Orgulho) (4.93)']
+                            ],
+                            datasets: [{
+                                label: 'Média da Pergunta',
+                                data: [2.88, 3.38, 4.93],
+                                backgroundColor: [colorCritical, colorCritical, colorPositive],
+                                borderRadius: 4
+                            }]
+                        },
+                        options: commonHorizontalOptions
+                    });
+                }
+
+                destroyChart(charts.creditoAnalise);
+                const ctxCreditoAnalise = document.getElementById('causaCreditoChart_Analise')?.getContext('2d');
+                if(ctxCreditoAnalise) {
+                    charts.creditoAnalise = new Chart(ctxCreditoAnalise, {
+                        type: 'bar',
+                        data: {
+                            labels: [
+                                ['Comunicação direta', 'e honesta (3.13)'],
+                                ['Confio em meus', 'colegas (3.50)'],
+                                ['Dimensão: Conexão', 'com colegas (3.72)'],
+                                ['Dimensão: Conexão', 'com líder (4.50)']
+                            ],
+                            datasets: [{
+                                label: 'Média da Pergunta',
+                                data: [3.13, 3.50, 3.72, 4.50],
+                                backgroundColor: [colorCritical, colorCritical, colorCritical, colorPositive],
+                                borderRadius: 4
+                            }]
+                        },
+                        options: commonHorizontalOptions
+                    });
+                }
+
+                destroyChart(charts.tiAnalise);
+                const ctxTiAnalise = document.getElementById('causaTiChart_Analise')?.getContext('2d');
+                if(ctxTiAnalise) {
+                    charts.tiAnalise = new Chart(ctxTiAnalise, {
+                        type: 'bar',
+                        data: {
+                            labels: [
+                                ['Processos entre', 'departamentos (3.25)'],
+                                ['Dimensão:', 'Empoderamento (3.86)'],
+                                ['Dimensão: Embaixador', '(Orgulho) (5.00)']
+                            ],
+                            datasets: [{
+                                label: 'Média da Pergunta',
+                                data: [3.25, 3.86, 5.00],
+                                backgroundColor: [colorNeutral, colorNeutral, colorPositive], 
+                                borderRadius: 4
+                            }]
+                        },
+                        options: commonHorizontalOptions
+                    });
+                }
+
+                destroyChart(charts.benchmarkAnalise);
+                const ctxBenchmarkAnalise = document.getElementById('causaBenchmarkChart_Analise')?.getContext('2d');
+                if(ctxBenchmarkAnalise) {
+                    charts.benchmarkAnalise = new Chart(ctxBenchmarkAnalise, {
+                        type: 'bar',
+                        data: {
+                            labels: [
+                                'Marketing',
+                                'Financeiro',
+                                'Gente e Cultura'
+                            ],
+                            datasets: [{
+                                label: 'Média Geral',
+                                data: [5.00, 4.90, 4.86],
+                                backgroundColor: colorPositive, 
+                                borderRadius: 4
+                            }]
+                        },
+                        options: commonHorizontalOptions
+                    });
+                }
+            };
+
+            // NAVEGAÇÃO PRINCIPAL (ABAS)
+            const mainTabButtonsContainer = document.getElementById('mainTabButtons');
+            const mainTabContents = document.getElementById('mainTabContents').children;
+
+            mainTabButtonsContainer.addEventListener('click', (event) => {
+                const clickedButton = event.target.closest('[data-main-tab-button]');
+                if (!clickedButton) return;
+
+                const tabId = clickedButton.dataset.mainTabButton;
+                
+                for (let button of mainTabButtonsContainer.children) {
+                    button.classList.remove('active');
+                }
+                clickedButton.classList.add('active');
+                
+                for (let content of mainTabContents) {
+                    if (content.dataset.mainTabContent === tabId) {
+                        content.classList.add('active');
+                        // Renderiza os gráficos APENAS da aba que se tornou ativa
+                        if (tabId === 'dashboard') {
+                            createDashboardCharts();
+                        } else if (tabId === 'analise') {
+                            createAnaliseCharts();
+                        }
+                    } else {
+                        content.classList.remove('active');
                     }
                 }
             });
 
-            new Chart(document.getElementById('fortesChart').getContext('2d'), {
-                type: 'bar',
-                data: {
-                    labels: ['Conexão com líder', 'Embaixador', 'Crescimento pessoal', 'Bem-estar'],
-                    datasets: [{
-                        label: 'Média',
-                        data: [4.72, 4.64, 4.56, 4.55],
-                        backgroundColor: colorPositive,
-                        borderRadius: 4
-                    }]
-                },
-                options: commonHorizontalOptions
-            });
-
-            new Chart(document.getElementById('fracosChart').getContext('2d'), {
-                type: 'bar',
-                data: {
-                    labels: [
-                        'Compensação', 
-                        ['Frequência de', 'reconhecimento'], 
-                        ['Frequência de', 'Feedback'], 
-                        ['Rotina de', 'Processos']
-                    ],
-                    datasets: [{
-                        label: 'Média',
-                        data: [3.75, 3.94, 3.97, 4.06],
-                        backgroundColor: colorCritical,
-                        borderRadius: 4
-                    }]
-                },
-                options: commonHorizontalOptions
-            });
-
-            new Chart(document.getElementById('departamentosChart').getContext('2d'), {
-                type: 'bar',
-                data: {
-                    labels: deptLabels,
-                    datasets: [{
-                        label: 'Média Departamental',
-                        data: deptData,
-                        backgroundColor: deptColors,
-                        borderRadius: 4
-                    }]
-                },
-                options: commonHorizontalOptions
-            });
-
-            new Chart(document.getElementById('causaControladoriaChart_Analise').getContext('2d'), {
-                type: 'bar',
-                data: {
-                    labels: [
-                        ['Reconhecimento', 'regular (1.75)'], 
-                        ['Frequência ideal', 'de feedback (2.25)'], 
-                        ['Dimensão: Rec.', '& Feedback (2.88)']
-                    ],
-                    datasets: [{
-                        label: 'Média da Pergunta',
-                        data: [1.75, 2.25, 2.88],
-                        backgroundColor: colorCritical,
-                        borderRadius: 4
-                    }]
-                },
-                options: commonHorizontalOptions
-            });
-
-            new Chart(document.getElementById('causaOperacoesChart_Analise').getContext('2d'), {
-                type: 'bar',
-                data: {
-                    labels: [
-                        ['Reconhecimento', 'regular (2.88)'],
-                        ['Dimensão: Reconhec.', '& Feedback (3.38)']
-                    ],
-                    datasets: [{
-                        label: 'Média da Pergunta',
-                        data: [2.88, 3.38],
-                        backgroundColor: colorCritical,
-                        borderRadius: 4
-                    }]
-                },
-                options: commonHorizontalOptions
-            });
-
-            new Chart(document.getElementById('causaCreditoChart_Analise').getContext('2d'), {
-                type: 'bar',
-                data: {
-                    labels: [
-                        ['Comunicação direta', 'e honesta (3.13)'],
-                        ['Confio em meus', 'colegas (3.50)'],
-                        ['Dimensão: Conexão', 'com colegas (3.72)']
-                    ],
-                    datasets: [{
-                        label: 'Média da Pergunta',
-                        data: [3.13, 3.50, 3.72],
-                        backgroundColor: colorCritical,
-                        borderRadius: 4
-                    }]
-                },
-                options: commonHorizontalOptions
-            });
-
-            new Chart(document.getElementById('causaTiChart_Analise').getContext('2d'), {
-                type: 'bar',
-                data: {
-                    labels: [
-                        ['Processos entre', 'departamentos (3.25)'],
-                        ['Dimensão:', 'Empoderamento (3.86)']
-                    ],
-                    datasets: [{
-                        label: 'Média da Pergunta',
-                        data: [3.25, 3.86],
-                        backgroundColor: colorNeutral, 
-                        borderRadius: 4
-                    }]
-                },
-                options: commonHorizontalOptions
-            });
-
-            new Chart(document.getElementById('benchmarksChart_Analise').getContext('2d'), {
-                type: 'bar',
-                data: {
-                    labels: deptLabels,
-                    datasets: [{
-                        label: 'Média Departamental',
-                        data: deptData,
-                        backgroundColor: deptColors,
-                        borderRadius: 4
-                    }]
-                },
-                options: commonHorizontalOptions
-            });
-
-            
+            // NAVEGAÇÃO SECUNDÁRIA (Plano de Ação)
             const tabButtonsContainer = document.getElementById('tabButtons');
             const tabContents = document.getElementById('tabContents').children;
 
             tabButtonsContainer.addEventListener('click', (event) => {
                 const clickedButton = event.target.closest('[data-tab]');
                 if (!clickedButton) return;
+
                 const tabId = clickedButton.dataset.tab;
                 
                 for (let button of tabButtonsContainer.children) {
@@ -983,25 +1118,16 @@
                 clickedButton.classList.add('active');
                 
                 for (let content of tabContents) {
-                    content.dataset.tabContent === tabId ? content.classList.add('active') : content.classList.remove('active');
+                    if (content.dataset.tabContent === tabId) {
+                        content.classList.add('active');
+                    } else {
+                        content.classList.remove('active');
+                    }
                 }
             });
 
-            const navLinks = document.querySelectorAll('[data-nav-link]');
-            const views = document.querySelectorAll('[data-view]');
-
-            navLinks.forEach(link => {
-                link.addEventListener('click', () => {
-                    const viewName = link.dataset.navLink;
-
-                    navLinks.forEach(nav => nav.classList.remove('active'));
-                    link.classList.add('active');
-
-                    views.forEach(view => {
-                        view.dataset.view === viewName ? view.classList.add('active') : view.classList.remove('active');
-                    });
-                });
-            });
+            // Inicializa os gráficos da primeira aba (Dashboard)
+            createDashboardCharts();
         });
     </script>
 </body>
